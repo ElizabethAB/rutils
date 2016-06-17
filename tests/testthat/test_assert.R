@@ -1,0 +1,5 @@
+test_that("One bad value", {})
+test_that("One good value", {})
+test_that("Multiple bad values", {})
+test_that("Multiple good values", {})
+test_that("Mixed good and bad values", {})

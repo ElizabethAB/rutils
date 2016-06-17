@@ -1,0 +1,6 @@
+test_that("Matching data.frame (columns of all data types)", {})
+test_that("Mismatch on single column, all data types", {})
+test_that("Mismatch in multiple columns", {})
+test_that("Mismatch in single row", {})
+test_that("Differing column titles", {})
+test_that("Differing ID values", {})

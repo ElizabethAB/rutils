@@ -1,0 +1,12 @@
+Package: rutils
+Title: Small utilities for my own use
+Version: 0.0.0.9000
+Authors@R: person("Elizabeth", "Byerly", email = "elizabeth.byerly@gmail.com", role = c("aut", "cre"))
+Description: Collect, manage, and test functions for my use.
+Depends:
+    R (>= 3.2.4)
+License: MIT
+LazyData: true
+Suggests:
+    testthat
+RoxygenNote: 5.0.1
