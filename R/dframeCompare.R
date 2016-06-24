@@ -43,37 +43,36 @@ dframeCompare <- function(df1, df2, ids, comp_cols = NULL, ...) {
   assert("df1 must be a dataframe", is.data.frame(df1))
   assert("df2 must be a dataframe", is.data.frame(df2))
 
+  # Confirm ID columns are present in both dataframes
+  assert("ID columns not found in df1", ids %in% colnames(df1))
+  assert("ID columns not found in df2", ids %in% colnames(df2))
+
   # Confirm ID columns produce unique observations
   assert("ID is non-unique in df1", sum(duplicated(df1[,ids])) == 0)
   assert("ID is non-unique in df2", sum(duplicated(df2[,ids])) == 0)
 
-  df1$.id <- apply(df1[,ids, drop = FALSE], 1,
-                   function(rw) paste0(rw, collapse = ":"))
-  df2$.id <- apply(df2[,ids, drop = FALSE], 1,
-                   function(rw) paste0(rw, collapse = ":"))
-
   if (is.null(comp_cols)) {
     comp_cols <- intersect(colnames(df1), colnames(df2))
   }
-  comp_cols <- setdiff(comp_cols, c(".id", ids))
+  comp_cols <- setdiff(comp_cols, c(ids))
 
   # Track overlap of columns and ID values
   ol_col <- compareContains(colnames(df1), colnames(df2), "columns")
   ol_ids <- compareContains(df1$.id, df2$.id, "id")
 
-  compare <- merge(df1[,c(".id", comp_cols)], df2[,c(".id", comp_cols)],
-                   by = ".id", all = FALSE, suffixes = c("_df1", "_df2"))
+  compare <- merge(df1[,c(ids, comp_cols)], df2[,c(ids, comp_cols)],
+                   by = ids, all = FALSE, suffixes = c("_df1", "_df2"))
 
   dif_df <- lapply(comp_cols, function(column) {
     difs <- columnDif(compare[,paste0(column, "_df1")],
-                      compare[,paste0(column, "_df2")])
+                       compare[,paste0(column, "_df2")])
     if (length(difs) > 0) {
-      compare[difs, c(".id", paste0(column, c("_df1", "_df2")))]
+      compare[difs, c(ids, paste0(column, c("_df1", "_df2"))), drop = FALSE]
     } else {
-      compare[difs, ".id", drop = FALSE]
+      compare[difs, ids, drop = FALSE]
     }
   })
-  dif_df <- Reduce(function(x, y) merge(x, y, all = TRUE, by = ".id"),
+  dif_df <- Reduce(function(x, y) merge(x, y, all = TRUE, by = ids),
                    dif_df[!is.null(dif_df)])
 
   list("differences_df" = dif_df,
@@ -82,11 +81,8 @@ dframeCompare <- function(df1, df2, ids, comp_cols = NULL, ...) {
 }
 
 columnDif <- function(vector1, vector2, clean = TRUE, decimals = 2) {
-  if (class(vector1) == "factor" | class(vector2) == "factor") {
-    shared <- union(unique(vector1), unique(vector2))
-    vector1 <- as.factor(vector1, levels = shared)
-    vector2 <- as.factor(vector2, levels = shared)
-  }
+  if (class(vector1) == "factor") vector1 <- as.character(vector1)
+  if (class(vector2) == "factor") vector2 <- as.character(vector2)
   value_match <- if (clean) {
     if (is.numeric(vector1) & is.numeric(vector2)) {
       round(vector1, decimals) == round(vector2, decimals)

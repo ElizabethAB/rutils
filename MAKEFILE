@@ -5,11 +5,14 @@ test:
 	Rscript -e 'devtools::test()'
 
 git:
-	@git add --all
-	@git --no-pager diff HEAD
-	@echo "Please type commit message:";
-	@read commit_message;\
-	git commit -m "$$commit_message";
+	git add --all
+	@if ! git --no-pager diff --cached --exit-code ; then \
+        echo "Please type commit message:" ; \
+        read commit_message ; \
+        git commit -m "$$commit_message" ; \
+	else \
+	    echo "No changes to local repository found." ; \
+	fi ;
 
 publish: docs test git
 	Rscript -e 'devtools::build()'
