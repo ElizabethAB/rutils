@@ -1,4 +1,4 @@
 library(testthat)
-library(ebilities)
+library(rutils)
 
-test_check("ebilities")
+test_check("rutils")
