@@ -58,14 +58,14 @@ dframeCompare <- function(df1, df2, ids, comp_cols = NULL, ...) {
 
   # Track overlap of columns and ID values
   ol_col <- compareContains(colnames(df1), colnames(df2), "columns")
-  ol_ids <- compareContains(df1$.id, df2$.id, "id")
+  ol_ids <- compareContains(df1[,ids], df2[,ids], "id")
 
   compare <- merge(df1[,c(ids, comp_cols)], df2[,c(ids, comp_cols)],
                    by = ids, all = FALSE, suffixes = c("_df1", "_df2"))
 
   dif_df <- lapply(comp_cols, function(column) {
     difs <- columnDif(compare[,paste0(column, "_df1")],
-                       compare[,paste0(column, "_df2")])
+                       compare[,paste0(column, "_df2")], ...)
     if (length(difs) > 0) {
       compare[difs, c(ids, paste0(column, c("_df1", "_df2"))), drop = FALSE]
     } else {
@@ -80,7 +80,7 @@ dframeCompare <- function(df1, df2, ids, comp_cols = NULL, ...) {
        "column_overlap" = ol_col)
 }
 
-columnDif <- function(vector1, vector2, clean = TRUE, decimals = 2) {
+columnDif <- function(vector1, vector2, clean = TRUE, decimals = 2, ...) {
   if (class(vector1) == "factor") vector1 <- as.character(vector1)
   if (class(vector2) == "factor") vector2 <- as.character(vector2)
   value_match <- if (clean) {
@@ -89,7 +89,7 @@ columnDif <- function(vector1, vector2, clean = TRUE, decimals = 2) {
     } else if (is.character(vector1) & is.character(vector2)) {
       stringr::str_trim(tolower(gsub("\\s+", " ", vector1))) ==
         stringr::str_trim(tolower(gsub("\\s+", " ", vector2)))
-    }
+    } else { vector1 == vector2 }
   } else vector1 == vector2
   value_match[is.na(value_match)] <- FALSE
   value_match <- value_match | (is.na(vector1) & is.na(vector2))

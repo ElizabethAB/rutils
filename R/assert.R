@@ -1,6 +1,6 @@
 #' Build intuitive assertion calls
 #'
-#' @param message (character) The error message to throw if the assertion fails
+#' @param message (character) The error message to throw if an assertion fails
 #' @param ... (boolean) Statements that evaluate to TRUE or FALSE
 #'
 #' @return None
@@ -13,7 +13,7 @@ assert <- function(message, ...) {
 
 #' Build intuitive warning messages
 #'
-#' @param message (character) The error message to throw if the assertion fails
+#' @param message (character) The warning message to throw if a check fails
 #' @param ... (boolean) Statements that evaluate to TRUE or FALSE
 #'
 #' @return None
